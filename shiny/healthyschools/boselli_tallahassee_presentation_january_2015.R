@@ -509,26 +509,29 @@ load("shiny_data.RData")
 # save.image("shiny_data.RData")
 
 # # MAP FOR TONY
-# library(maps)
-# my_map <- map("county", "florida")
-# my_map$names <- sub("florida,|:main|:spit", "", my_map$names)
-# county <- data.frame("county" = my_map$names)
-# healthy_schools <- c("escambia", "santa rosa", "okaloosa",
-#                      "lafayette", "suwannee", "hamilton", "columbia",
-#                      "baker", "nassau", "duval", "clay", "putnam", "union", "bradford",
-#                      "st johns", "flagler", "marion", "volusia", "hernando", 
-#                      "pasco", "hillsborough", "polk", "osceola", "seminole",
-#                      "st lucie", "sarasota", "palm beach", "miami-dade")
-# county$tony <- NA
-# county$tony <-  county$county %in% healthy_schools
-# county$color <- adjustcolor(ifelse(county$tony, "darkred", "grey"), alpha.f = 0.5)
-# map("county", "fl",
-#     fill = TRUE, 
-#     col = county$color)
-# map.text("county", "fl", exact = FALSE, labels = toupper(as.character(county$county)), cex = 0.1,
-#          add = TRUE, move = FALSE, col = adjustcolor("black", alpha.f = 0.6))
-# legend("left",
-#        fill = adjustcolor(c("darkred", "grey"), alpha.f = 0.5),
-#        legend = c("Yes", "No"),
-#        title = "Healthy Schools Presence",
-#        bty = "n")
+library(maps)
+my_map <- map("county", "florida")
+my_map$names <- sub("florida,", "", my_map$names)
+my_map$names[which(grepl("okaloosa", my_map$names))] <- "okaloosa"
+
+county <- data.frame("county" = my_map$names)
+healthy_schools <- c("escambia", "santa rosa", "okaloosa",
+                     "lafayette", "suwannee", "hamilton", "columbia",
+                     "baker", "nassau", "duval", "clay", "putnam", "union", "bradford",
+                     "st johns", "flagler", "marion", "volusia", "hernando", 
+                     "pasco", "hillsborough", "polk", "osceola", "seminole",
+                     "st lucie", "sarasota", "palm beach", "miami-dade",
+                     "okaloosa")
+county$tony <- NA
+county$tony <-  county$county %in% healthy_schools
+county$color <- adjustcolor(ifelse(county$tony, "darkred", "grey"), alpha.f = 0.5)
+map("county", "fl",
+    fill = TRUE, 
+    col = county$color)
+map.text("county", "fl", exact = FALSE, labels = toupper(as.character(county$county)), cex = 0.1,
+         add = TRUE, move = FALSE, col = adjustcolor("black", alpha.f = 0.6))
+legend("left",
+       fill = adjustcolor(c("darkred", "grey"), alpha.f = 0.5),
+       legend = c("Yes", "No"),
+       title = "Healthy Schools Presence",
+       bty = "n")
