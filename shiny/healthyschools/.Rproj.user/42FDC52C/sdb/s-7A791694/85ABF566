@@ -1,0 +1,16 @@
+{
+    "contents" : "# This is the server logic for a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n#setwd(\"C:/Users/BrewJR/Documents/uf/phc7934/populationsAndHealth/shiny\")\n\n\n\nshinyServer(function(input, output) {\n  \n  output$plot1 <- renderPlot({\n    barplot(1:10)\n    })\n  \n  output$plot2 <- renderPlot({\n    plot(1:10)\n  })\n\n  \n  output$motionchart1 <- renderGvis({\n    \n    gvisMotionChart(data = WorldBank,\n                    idvar=\"country\", timevar=\"year\",\n                    xvar=\"life.expectancy\", \n                    yvar=\"fertility.rate\",\n                    colorvar=\"region\", \n                    sizevar=\"population\",\n                    options=list(width=550, height=500))\n    \n  })\n  \n})",
+    "created" : 1420499242622.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2117502928",
+    "id" : "85ABF566",
+    "lastKnownWriteTime" : 1420499452,
+    "path" : "~/healthy_schools/shiny/healthyschools/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
