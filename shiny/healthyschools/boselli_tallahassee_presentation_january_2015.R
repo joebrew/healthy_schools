@@ -180,7 +180,7 @@ load("shiny_data.RData")
 #                       current_imm = 29, 
 #                       new_imm = NULL,
 #                       my_colors = colorRampPalette(c("darkorange", "blue"))(100),
-#                       show_difference = TRUE){
+#                       show_difference = FALSE){
 #   
 #   # Calculate values
 #   x <- vector(mode = "numeric", length = 100)
@@ -192,21 +192,33 @@ load("shiny_data.RData")
 #   bp <- barplot(x,
 #                 border = NA,
 #                 col = my_colors,
-#                 names.arg = 1:100,
+#                 #names.arg = 1:100,
 #                 cex.names = 0.5,
-#                 xlab = "Pediatric immunization rate",
+#                 xlab = NA, #"Pediatric immunization rate",
 #                 space = 0) 
+#   mtext(text = seq(0, 100, 10),
+#         side = 1, 
+#         line =0,
+#         at = seq(0, 100, 10))
+#   mtext(text = "Pediatric immunization rate",
+#         side = 1,
+#         line = 1,
+#         at = 50)
 #   
 #   # Label
 #   text(x = bp[,1][current_imm],
 #        y = x[current_imm]*1.1,
 #        labels = millionize(x[current_imm]),
-#        pos = 3,
+#        pos = 4,
+#        col = adjustcolor("darkorange", alpha.f = 0.8),
+#        cex = 0.6)
+#   points(x = bp[,1][current_imm],
+#        y = x[current_imm], pch = 16,
 #        col = adjustcolor("darkorange", alpha.f = 0.8))
 #   
 #   # ablines
-#   abline(v = bp[,1][current_imm], col = adjustcolor("darkorange", alpha.f = 0.3), lwd = 2)
-#   abline(v = bp[,1][new_imm], col = adjustcolor("blue", alpha.f = 0.3), lwd = 2)
+#   abline(v = bp[,1][current_imm], col = adjustcolor("darkorange", alpha.f = 0.1), lwd = 2)
+#   abline(v = bp[,1][new_imm], col = adjustcolor("blue", alpha.f = 0.1), lwd = 2)
 #   
 #   
 #   # new immunization
@@ -214,9 +226,13 @@ load("shiny_data.RData")
 #     text(x = bp[,1][new_imm],
 #          y = x[new_imm]*1.1,
 #          labels = millionize(x[new_imm]),
-#          pos = 3,
-#          cex = 1,
+#          pos = 4,
+#          cex = 0.6,
 #          col = adjustcolor("blue", alpha.f = 0.7))
+#     points(x = bp[,1][new_imm],
+#            y = x[new_imm], pch = 16,
+#            col = adjustcolor("blue", alpha.f = 0.7))
+#     
 #     
 #     # difference
 #     if(show_difference){
@@ -236,7 +252,7 @@ load("shiny_data.RData")
 # options(scipen=999)
 # 
 # # Direct costs
-# visualize(fun = direct_costs, new_imm = 50)
+# visualize(fun = direct_costs, new_imm = c(40, 50, 60, 70))
 # title(main = "Direct costs", cex.main = 1)
 # 
 # #indirect costs
@@ -257,9 +273,10 @@ load("shiny_data.RData")
 # visualize(fun = deaths, new_imm = c(40, 50, 60, 70))
 # title(main = "Deaths", cex.main = 1)
 # 
-# #deaths
+# #medicaid_costs
 # visualize(fun = medicaid_costs, new_imm = c(40, 50, 60, 70))
 # title(main = "Medicaid costs", cex.main = 1)
+# 
 # 
 # # average
 # avg <- 35.4
@@ -276,33 +293,55 @@ load("shiny_data.RData")
 # 
 # # CENSUS STUFF
 # source("census.R")
-# # reads in a df called "ages" with florida's age breakdown
 # 
+# # "state" has the age breakdown for each county
 # # add some grouped names to ages
-# ages$age0004 <- sum(ages[,1:5])
-# ages$age0517 <-sum(ages[,6:18])
-# ages$age1844 <-sum(ages[,18:45])
-# ages$age4564 <-sum(ages[,45:65])
-# ages$age65plus<-sum(ages[,66:104])
+# state$age0004 <-NA
+# state$age0517 <-NA
+# state$age1844 <-NA
+# state$age4564 <-NA
+# state$age65plus<-NA
+# 
+# for (i in 1:nrow(state)){
+#   state$age0004[i] <- sum(state[i,2:6])
+#   state$age0517[i] <-sum(state[i,7:19])
+#   state$age1844[i] <-sum(state[i,19:46])
+#   state$age4564[i] <-sum(state[i,46:66])
+#   state$age65plus[i] <-sum(state[i,67:104])
+# }
+# 
 # 
 # # clean up
-# ages <- data.frame(ages[,c("age0004", "age0517", "age1844", "age4564", "age65plus")])
-# ages$place <- "florida"
-# 
-# # add some grouped names to alachua
-# alachua$age0004 <- sum(alachua[,1:5])
-# alachua$age0517 <-sum(alachua[,6:18])
-# alachua$age1844 <-sum(alachua[,18:45])
-# alachua$age4564 <-sum(alachua[,45:65])
-# alachua$age65plus<-sum(alachua[,66:104])
-# 
-# # clean up
-# alachua <- data.frame(alachua[,c("age0004", "age0517", "age1844", "age4564", "age65plus")])
-# alachua$place <- "alachua"
-# 
-# # combine
-# er <- rbind(alachua, ages)
-# # based on 2012/13 year
+# place <- state$AreaName
+# state <- data.frame(state[,c("age0004", "age0517", "age1844", "age4564", "age65plus")])
+# state <- cbind(state, place)
+# # # reads in a df called "ages" with florida's age breakdown
+# # 
+# # # add some grouped names to ages
+# # ages$age0004 <- sum(ages[,1:5])
+# # ages$age0517 <-sum(ages[,6:18])
+# # ages$age1844 <-sum(ages[,18:45])
+# # ages$age4564 <-sum(ages[,45:65])
+# # ages$age65plus<-sum(ages[,66:104])
+# # 
+# # # clean up
+# # ages <- data.frame(ages[,c("age0004", "age0517", "age1844", "age4564", "age65plus")])
+# # ages$place <- "florida"
+# # 
+# # # add some grouped names to alachua
+# # alachua$age0004 <- sum(alachua[,1:5])
+# # alachua$age0517 <-sum(alachua[,6:18])
+# # alachua$age1844 <-sum(alachua[,18:45])
+# # alachua$age4564 <-sum(alachua[,45:65])
+# # alachua$age65plus<-sum(alachua[,66:104])
+# # 
+# # # clean up
+# # alachua <- data.frame(alachua[,c("age0004", "age0517", "age1844", "age4564", "age65plus")])
+# # alachua$place <- "alachua"
+# # 
+# # # combine
+# # er <- rbind(alachua, ages)
+# # # based on 2012/13 year
 # 
 # 
 # # Read in attack rates for 11/12 year and 12/13 year
@@ -325,35 +364,81 @@ load("shiny_data.RData")
 # # convert flu to p
 # flu[,1:5] <- flu[,1:5] / 100000
 # 
+# # clean up place
+# flu$place <- toupper(flu$place)
+# 
 # # Calculate number of true cases 
-# real <- flu[,-6] * er[, -6]
+# real <- state
+# for (i in 1:nrow(state)){
+#   real[i, -6] <- real[i, -6] * flu[2, -6]
+# }
+# # if alachua were like florida
+# worst <- real
+# # Fix alachua
+# # real[which(real$place == "ALACHUA"), -6] <- 
+# #   state[which(state$place == "ALACHUA"), -6] * flu[1, -6]
 # 
 # # Calculate number of cases if all counties like alachua
-# best <- real
-# best[2,-6] <- er[2,-6] * flu[1,-6]
+# best <- state
+# for (i in 1:nrow(state)){
+#   best[i, -6] <- best[i, -6] * flu[1, -6]
+# }
 # 
-# # Calculate number of cases if alachua like florida
-# worst <- real
-# worst[1, -6] <- er[1, -6] * flu[2, -6]
+# 
+# 
+# 
+# 
+# # # # Calculate number of true cases 
+# # # real <- flu[,-6] * er[, -6]
+# # 
+# # # Calculate number of cases if all counties like alachua
+# # best <- real
+# # best[2,-6] <- er[2,-6] * flu[1,-6]
+# # 
+# # # Calculate number of cases if alachua like florida
+# # worst <- real
+# # worst[1, -6] <- er[1, -6] * flu[2, -6]
 # 
 # # Function to plot
-# plot_scenario <- function(df, alachua_row=TRUE, add = FALSE, color = "blue"){
-#   number <- ifelse(alachua_row, 1, 2)
-#   vals <- as.numeric(df[number,])
+# plot_scenario <- function(df, 
+#                           county = "FLORIDA", 
+#                           #alachua_row=TRUE, 
+#                           add = FALSE, 
+#                           color = "blue"){
+#   #number <- ifelse(alachua_row, 1, 2)
+# 
+#   vals <- as.numeric(df[which(df$place == county),1:5])
+#   bad_vals  <- as.numeric(worst[which(worst$place == county),1:5])
+#   
 #   if(add){
 #     bp <- barplot(vals,
 #                   add = add, 
 #                   col = adjustcolor(color, alpha.f = 0.6))
 #     
 #     
-#     text(x = bp[,1]+0.2,
+#     text(x = bp[,1],
 #          y = round(vals),
 #          labels = round(vals),
+#          pos = 1,
+#          col = adjustcolor("black", alpha.f = 0.8))
+#     
+#     text(x = bp[5,1],
+#          y = max(vals) * 1.2,
 #          pos = 3,
-#          col = color)
+#          col = adjustcolor("black", alpha.f = 0.8),
+#          labels = paste0(millionize( (sum(bad_vals) - sum(vals) )  ), "\nED cases\naverted"),
+#          cex = 1.7)
+#     
+#     legend(x = "topright",
+#            fill = adjustcolor(c("blue", "purple"), alpha.f = 0.6),
+#            bty = "n",
+#            legend = c("True", "Projected"),
+#            cex = 0.6)
+# 
+# 
 #   }else{
 #     bp <- barplot(vals,
-#                   add = add, 
+#                   add = FALSE, 
 #                   names.arg = c("0-4",
 #                                 "5-17", 
 #                                 "18-44",
@@ -364,7 +449,7 @@ load("shiny_data.RData")
 #                   ylim = c(0, max(vals) * 1.1),
 #                   col = adjustcolor(color, alpha.f = 0.4)) 
 #     
-#     text(x = bp[,1]-0.2,
+#     text(x = bp[,1],
 #          y = round(vals),
 #          labels = round(vals),
 #          pos = 3,
@@ -374,6 +459,13 @@ load("shiny_data.RData")
 #   box("plot")
 # 
 # }
+# 
+# plot_scenario(df = worst, county = "ALACHUA")
+# plot_scenario(df = best, county = "ALACHUA", col = "red", add = T)
+# 
+# 
+# plot_scenario(df = worst, county = "FLORIDA")
+# plot_scenario(df = best, county = "FLORIDA", col = "red", add = T)
 # 
 # plot_scenario(df = worst, col = "red")
 # plot_scenario(df = real, add = T, col = "blue")
@@ -409,5 +501,34 @@ load("shiny_data.RData")
 #      col = "blue")
 # box("plot")
 # 
+# 
+# 
+# # source the ed_savings function
+# source("ed_savings.R")
 # # Load once and save for shiny app
 # save.image("shiny_data.RData")
+
+# # MAP FOR TONY
+# library(maps)
+# my_map <- map("county", "florida")
+# my_map$names <- sub("florida,|:main|:spit", "", my_map$names)
+# county <- data.frame("county" = my_map$names)
+# healthy_schools <- c("escambia", "santa rosa", "okaloosa",
+#                      "lafayette", "suwannee", "hamilton", "columbia",
+#                      "baker", "nassau", "duval", "clay", "putnam", "union", "bradford",
+#                      "st johns", "flagler", "marion", "volusia", "hernando", 
+#                      "pasco", "hillsborough", "polk", "osceola", "seminole",
+#                      "st lucie", "sarasota", "palm beach", "miami-dade")
+# county$tony <- NA
+# county$tony <-  county$county %in% healthy_schools
+# county$color <- adjustcolor(ifelse(county$tony, "darkred", "grey"), alpha.f = 0.5)
+# map("county", "fl",
+#     fill = TRUE, 
+#     col = county$color)
+# map.text("county", "fl", exact = FALSE, labels = toupper(as.character(county$county)), cex = 0.1,
+#          add = TRUE, move = FALSE, col = adjustcolor("black", alpha.f = 0.6))
+# legend("left",
+#        fill = adjustcolor(c("darkred", "grey"), alpha.f = 0.5),
+#        legend = c("Yes", "No"),
+#        title = "Healthy Schools Presence",
+#        bty = "n")

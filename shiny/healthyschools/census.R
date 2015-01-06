@@ -1,6 +1,7 @@
 ### SETWD
 #setwd("C:/Users/BrewJR/Documents/healthy_schools")
 
+library(dplyr)
 
 ## Read in population data for florida zip codes
 pop <- read.csv("florida_details.csv", skip = 1)
@@ -23,3 +24,11 @@ alachua <- pop %>%
 names(alachua)[c(1:2, 
            101:103)] <- c("Total0Years", "Total1Years",
                           "Total100-104Years", "Total105-109Years", "Total110+Years")
+
+pop$AreaName <- as.character(toupper(sub(" County", "", pop$AreaName)))
+state <- pop %>% 
+  filter(RaceEthnicity == "Total" ) %>%
+  select(AreaName, TotalUnder1Year:Total110YearsandOlder)
+names(state)[c(2:3, 
+                 102:104)] <- c("Total0Years", "Total1Years",
+                                "Total100-104Years", "Total105-109Years", "Total110+Years")
